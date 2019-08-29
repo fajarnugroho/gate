@@ -5,14 +5,22 @@ services:
     volumes:
       - ${PWD}/data:/var/lib/mysql
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-  
+      - MYSQL_USER=gate
+      - MYSQL_PASSWORD=gate
+    restart: always
+
+  gate-redis:
+    image: redis:5-alpine
+    restart: always
+
   gate:
     image: gate
     ports:
       - "3000:3000"
-    depends_on: 
+    depends_on:
       - gate-sql
+      - gate-redis
     env_file:
       - .env
-    command: sh ./setup.sh
+    command: sh ./run.sh
+    restart: always
