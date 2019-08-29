@@ -7,10 +7,14 @@ if [[ $# -lt 1 ]]; then
   exit 1
 fi
 
+cd /etc/openvpn/server/easy-rsa
 source vars
-
+./easy-rsa build-client-full $1 nopass
 touch /etc/openvpn/keys/$1.ovpn
-
+CA=$(cat /etc/openvpn/server/easy-rsa/pki/ca.crt)
+CERT=$(cat /etc/openvpn/server/easy-rsa/pki/issued/$1.crt)
+KEY=$(cat /etc/openvpn/server/easy-rsa/pki/private/$1.key)
+TA=$(cat /etc/openvpn/server/ta.key)
 cat > /etc/openvpn/keys/$1.ovpn <<EOF
 client
 dev tun
@@ -20,22 +24,32 @@ resolv-retry infinite
 nobind
 persist-key
 persist-tun
-ca ca.crt
-cert $1.crt
-key $1.key
 comp-lzo
 verb 3
-auth-user-pass
-auth-nocache
+remote-cert-tls server
+auth SHA512
+cipher AES-256-CBC
+setenv opt block-outside-dns
+key-direction 1
 tun-mtu 1400
 mssfix 1400
-#Add your routes
-route <<x.1.0.0 255.255.0.0>>
-route <<x.4.0.0 255.255.0.0>>
+route 10.8.0.0 255.255.255.0
+route 10.181.131.0 255.255.255.0
+<ca>
+$CA
+</ca>
+<cert>
+$CERT
+</cert>
+<key>
+$KEY
+</key>
+<tls-auth>
+$TA
+</tls-auth>
 EOF
 
-./pkitool $1
-cd /etc/openvpn/keys/ && tar zcf $1.tar.gz ca.crt $1.crt $1.key $1.ovpn
+cd /etc/openvpn/keys/ && tar zcf $1.tar.gz $1.ovpn
 chmod 0600 $1.tar.gz
 
 mkdir -p  /opt/vpnkeys/
