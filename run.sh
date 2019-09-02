@@ -1,4 +1,4 @@
-if [ $RAILS_ENV = "production"]
+if [ $RAILS_ENV = "production" ]
 then
   rails s -e production
 else
