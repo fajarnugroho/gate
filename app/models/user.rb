@@ -125,7 +125,8 @@ class User < ApplicationRecord
           LIMIT 1
         ) AS gid_count
       )).
-      where("id = ? AND user_login_id = ?", user_ids, user_name)
+      where(id: user_ids).
+      where(user_login_id: user_name)
     users.map(&:user_passwd_response)
   end
 
