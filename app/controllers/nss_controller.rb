@@ -54,15 +54,15 @@ class NssController < ApplicationController
   end
 
   def passwd
-    @response = REDIS_CACHE.get("#{PASSWD_RESPONSE}:#{params[:token]}")
+    @response = REDIS_CACHE.get("#{PASSWD_RESPONSE}:#{params[:token]}#{params[:name]}")
     @response = JSON.parse(@response) if @response.present?
     if @response.blank?
       host_machine = HostMachine.find_by(access_key: params[:token])
       sysadmins = host_machine.sysadmins if host_machine.present?
       if sysadmins.present? && sysadmins.count.positive?
         @response = User.get_sysadmins(sysadmins, params[:name])
-        REDIS_CACHE.set("#{PASSWD_RESPONSE}:#{params[:token]}", @response.to_json)
-        REDIS_CACHE.expire("#{PASSWD_RESPONSE}:#{params[:token]}", REDIS_KEY_EXPIRY)
+        REDIS_CACHE.set("#{PASSWD_RESPONSE}:#{params[:token]}#{params[:name]}", @response.to_json)
+        REDIS_CACHE.expire("#{PASSWD_RESPONSE}:#{params[:token]}#{params[:name]}", REDIS_KEY_EXPIRY)
       end
     end
     render json: @response
