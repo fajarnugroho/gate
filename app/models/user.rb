@@ -99,7 +99,7 @@ class User < ApplicationRecord
     "#{name} (#{email})"
   end
 
-  def self.get_sysadmins user_ids
+  def self.get_sysadmins(user_ids, user_name)
     users = User.
       select(%Q(
         id,
@@ -125,7 +125,7 @@ class User < ApplicationRecord
           LIMIT 1
         ) AS gid_count
       )).
-      where(id: user_ids)
+      where("id = ? AND user_login_id = ?", user_ids, user_name)
     users.map(&:user_passwd_response)
   end
 

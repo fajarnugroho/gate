@@ -60,7 +60,7 @@ class NssController < ApplicationController
       host_machine = HostMachine.find_by(access_key: params[:token])
       sysadmins = host_machine.sysadmins if host_machine.present?
       if sysadmins.present? && sysadmins.count.positive?
-        @response = User.get_sysadmins sysadmins
+        @response = User.get_sysadmins(sysadmins, params[:name])
         REDIS_CACHE.set("#{PASSWD_RESPONSE}:#{params[:token]}", @response.to_json)
         REDIS_CACHE.expire("#{PASSWD_RESPONSE}:#{params[:token]}", REDIS_KEY_EXPIRY)
       end
