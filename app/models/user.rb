@@ -99,7 +99,7 @@ class User < ApplicationRecord
     "#{name} (#{email})"
   end
 
-  def get_user_by_uid user_uid
+  def self.get_user_by_uid user_uid
     users = User.
       select(%Q(
         id,
