@@ -38,18 +38,32 @@ class NssController < ApplicationController
   end
 
   def group
-    @response = REDIS_CACHE.get("#{GROUP_RESPONSE}:#{params[:token]}")
-    @response = JSON.parse(@response) if @response.present?
-    if @response.blank?
-      host_machine = HostMachine.find_by(access_key: params[:token])
-      sysadmins = host_machine.sysadmins if host_machine.present?
-      if sysadmins.present? && sysadmins.count.positive?
-        @response = Group.get_sysadmins_and_groups sysadmins, host_machine.default_admins
-        REDIS_CACHE.set("#{GROUP_RESPONSE}:#{params[:token]}", @response.to_json)
-        REDIS_CACHE.expire("#{GROUP_RESPONSE}:#{params[:token]}", REDIS_KEY_EXPIRY)
+    name = params[:name]
+    if name.present?
+      @response = REDIS_CACHE.get("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{name}")
+      @response = JSON.parse(@response) if @response.present?
+      if @response.blank?
+        host_machine = HostMachine.find_by(access_key: params[:token])
+        if host_machine.present?
+          group = Group.get_name_response name
+          @response = group.to_json
+          REDIS_CACHE.set("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{name}", @response)
+          REDIS_CACHE.expire("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{name}", REDIS_KEY_EXPIRY)
+        end
+      end
+    else
+      @response = REDIS_CACHE.get("#{GROUP_RESPONSE}:#{params[:token]}")
+      @response = JSON.parse(@response) if @response.present?
+      if @response.blank?
+        host_machine = HostMachine.find_by(access_key: params[:token])
+        sysadmins = host_machine.sysadmins if host_machine.present?
+        if sysadmins.present? && sysadmins.count.positive?
+          @response = Group.get_sysadmins_and_groups sysadmins, host_machine.default_admins
+          REDIS_CACHE.set("#{GROUP_RESPONSE}:#{params[:token]}", @response.to_json)
+          REDIS_CACHE.expire("#{GROUP_RESPONSE}:#{params[:token]}", REDIS_KEY_EXPIRY)
+        end
       end
     end
-
     render json: @response
   end
 
