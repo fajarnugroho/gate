@@ -303,7 +303,7 @@ class User < ApplicationRecord
 
 
   def self.get_shadow_name_response name
-    user = User.where(name: name).first
+    user = User.where(user_login_id: name).first
     return nil if user.blank?
 
     user.get_shadow_hash
