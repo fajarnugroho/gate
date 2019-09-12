@@ -58,7 +58,7 @@ class NssController < ApplicationController
       if @response.blank?
         host_machine = HostMachine.find_by(access_key: params[:token])
         if host_machine.present?
-          group = Group.get_gid_response(gid).first
+          group = Group.get_gid_response(gid)
           @response = group.to_json
           REDIS_CACHE.set("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{gid}", @response)
           REDIS_CACHE.expire("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{gid}", REDIS_KEY_EXPIRY)
