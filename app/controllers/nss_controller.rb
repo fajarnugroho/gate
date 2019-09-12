@@ -84,7 +84,7 @@ class NssController < ApplicationController
   end
 
   def shadow
-    host_machine = HostMachine..find_by(access_key: params[:token])
+    host_machine = HostMachine.find_by(access_key: params[:token])
     @response = nil
 
     if host_machine.present?
