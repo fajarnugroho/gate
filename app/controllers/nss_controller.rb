@@ -79,6 +79,7 @@ class NssController < ApplicationController
           REDIS_CACHE.expire("#{PASSWD_RESPONSE}:#{params[:token]}", REDIS_KEY_EXPIRY)
         end
       end
+    end
     render json: @response
   end
 
