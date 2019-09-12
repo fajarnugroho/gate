@@ -39,6 +39,7 @@ class NssController < ApplicationController
 
   def group
     name = params[:name]
+    gid = params[:gid]
     if name.present?
       @response = REDIS_CACHE.get("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{name}")
       @response = JSON.parse(@response) if @response.present?
@@ -49,6 +50,18 @@ class NssController < ApplicationController
           @response = group.to_json
           REDIS_CACHE.set("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{name}", @response)
           REDIS_CACHE.expire("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{name}", REDIS_KEY_EXPIRY)
+        end
+      end
+    elsif gid.present?
+      @response = REDIS_CACHE.get("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{gid}")
+      @response = JSON.parse(@response) if @response.present?
+      if @response.blank?
+        host_machine = HostMachine.find_by(access_key: params[:token])
+        if host_machine.present?
+          group = Group.get_gid_response(gid).first
+          @response = group.to_json
+          REDIS_CACHE.set("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{gid}", @response)
+          REDIS_CACHE.expire("#{GROUP_NSS_RESPONSE}:#{params[:token]}#{gid}", REDIS_KEY_EXPIRY)
         end
       end
     else
@@ -83,7 +96,7 @@ class NssController < ApplicationController
           REDIS_CACHE.expire("#{PASSWD_RESPONSE}:#{params[:token]}#{name}", REDIS_KEY_EXPIRY)
         end
       end
-    else if uid.present?
+    elsif uid.present?
       @response = REDIS_CACHE.get("#{PASSWD_RESPONSE}:#{params[:token]}#{uid}")
       @response = JSON.parse(@response) if @response.present?
       if @response.blank?
