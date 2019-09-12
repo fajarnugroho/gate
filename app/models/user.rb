@@ -99,7 +99,7 @@ class User < ApplicationRecord
     "#{name} (#{email})"
   end
 
-  def self.get_sysadmins(user_ids, user_name)
+  def self.get_user_sysadmin(user_ids, user_name)
     users = User.
       select(%Q(
         id,
@@ -126,6 +126,35 @@ class User < ApplicationRecord
         ) AS gid_count
       )).
       where(id: user_ids, user_login_id: user_name)
+    users.map(&:user_passwd_response)
+  end
+  def self.get_sysadmins user_ids
+    users = User.
+      select(%Q(
+        id,
+        name,
+        uid,
+        user_login_id,
+        (
+          SELECT gid
+          FROM groups
+          INNER JOIN group_associations
+            ON groups.id = group_associations.group_id
+          WHERE group_associations.user_id = users.id
+          AND groups.name = users.user_login_id
+          LIMIT 1
+        ) AS gid,
+        (
+          SELECT COUNT(gid)
+          FROM groups
+          INNER JOIN group_associations
+            ON groups.id = group_associations.group_id
+          WHERE group_associations.user_id = users.id
+          AND groups.name = users.user_login_id
+          LIMIT 1
+        ) AS gid_count
+      )).
+      where(id: user_ids)
     users.map(&:user_passwd_response)
   end
 
