@@ -99,6 +99,36 @@ class User < ApplicationRecord
     "#{name} (#{email})"
   end
 
+  def get_user_by_uid user_uid
+    users = User.
+      select(%Q(
+        id,
+        name,
+        uid,
+        user_login_id,
+        (
+          SELECT gid
+          FROM groups
+          INNER JOIN group_associations
+            ON groups.id = group_associations.group_id
+          WHERE group_associations.user_id = users.id
+          AND groups.name = users.user_login_id
+          LIMIT 1
+        ) AS gid,
+        (
+          SELECT COUNT(gid)
+          FROM groups
+          INNER JOIN group_associations
+            ON groups.id = group_associations.group_id
+          WHERE group_associations.user_id = users.id
+          AND groups.name = users.user_login_id
+          LIMIT 1
+        ) AS gid_count
+      )).
+      where(uid: user_uid)
+    users.map(&:user_passwd_response)
+  end
+
   def self.get_user_sysadmin(user_ids, user_name)
     users = User.
       select(%Q(
