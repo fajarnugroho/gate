@@ -144,8 +144,9 @@ class Group < ApplicationRecord
         Group.generate_group_response(group.name, group.gid, members)
       end
     groups << Group.get_default_sysadmin_group_for_host(sysadmins_login_ids, default_admins)
-    groups << Group.get_groups_by_host_access(machine_id)
-    groups.to_json
+    groups += Group.get_groups_by_host_access(machine_id)
+    groups_set = groups.to_set
+    groups_set.to_a.to_json
   end
 
   def self.get_groups_by_host_access machine_id
@@ -163,7 +164,7 @@ class Group < ApplicationRecord
           WHERE group_associations.group_id = groups.id
         ) AS members
       )).
-      where('id', host_access_group).
+      where('id': host_access_group).
       map do |group|
         members = (group.members || '').split(',')
         Group.generate_group_response(group.name, group.gid, members)
