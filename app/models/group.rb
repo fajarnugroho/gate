@@ -144,7 +144,7 @@ class Group < ApplicationRecord
         Group.generate_group_response(group.name, group.gid, members)
       end
     groups << Group.get_default_sysadmin_group_for_host(sysadmins_login_ids, default_admins)
-    groups << Group.get_groups_by_host_access machine_id
+    groups << Group.get_groups_by_host_access(machine_id)
     groups.to_json
   end
 
