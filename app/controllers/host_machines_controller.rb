@@ -8,7 +8,6 @@ class HostMachinesController < ApplicationController
   def index
     @title = 'Host'
     @host_machines = HostMachine.all
-    @host_machines = []
     @host_machine_search = params[:host_machine_search]
     if @host_machine_search.present?
       if current_user.admin?

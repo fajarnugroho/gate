@@ -158,7 +158,7 @@ class ProfileController < ApplicationController
   end
 
   def list
-    @users = []
+    @users = User.all
     @user_search = params[:user_search]
     if @user_search.present?
       @users = User.where('name LIKE ? OR email LIKE ?', "%#{@user_search}%", "%#{@user_search}%").

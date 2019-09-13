@@ -8,7 +8,7 @@ class GroupsController < ApplicationController
   prepend_before_action :setup_user if Rails.env.development?
 
   def index
-    @groups = []
+    @groups = Group.all
     @group_search = params[:group_search]
     if current_user.admin && @group_search.present?
       @groups = Group.where('name LIKE ?', "%#{@group_search}%")

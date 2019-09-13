@@ -63,6 +63,11 @@ Rails.application.routes.draw do
   post 'nss/host' => 'nss#add_host', as: 'add_nss_host', format: :json
   get 'nss/user/groups' => 'nss#groups_list', as: 'profile_groups_list', format: :json
 
+  #Specific Users routes
+  get 'users' => 'profiles#list', as: 'users'
+
+  #Specific Host Machine routes
+  get 'host_machines' => 'host_machines#index', as: 'host_machines'
   #Specific Group routes
 
   post 'groups/:id/add_user' => 'groups#add_user', as: 'add_user_to_group'
