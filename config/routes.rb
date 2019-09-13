@@ -64,7 +64,7 @@ Rails.application.routes.draw do
   get 'nss/user/groups' => 'nss#groups_list', as: 'profile_groups_list', format: :json
 
   #Specific Users routes
-  get 'users' => 'profiles#list', as: 'users'
+  get 'users' => 'profile#list', as: 'users'
 
   #Specific Host Machine routes
   get 'host_machines' => 'host_machines#index', as: 'host_machines'
