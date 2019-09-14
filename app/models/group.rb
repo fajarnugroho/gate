@@ -194,7 +194,7 @@ class Group < ApplicationRecord
         sysadmins = sysadmins + group.get_user_ids
       end
     end
-    group_id = group.blank? ? 8999 : group.id
+    group_id = group.blank? ? 8999 : group.gid
 
     sysadmin_group = Group.generate_group_response('sysadmins', group_id, sysadmins.uniq)
     sysadmin_group
